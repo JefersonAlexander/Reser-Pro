@@ -19,10 +19,12 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>microservice-fleetLocation</module>
-    <module>microservice-authentication</module>
-    <module>api-gateway</module>
-    <module>discovery-server</module>
+    <module>auth-service</module>
+    <module>booking</module>
+    <module>dicovery-server</module>
+    <module>gateway</module>
+    <module>payment</module>
+    <module>property</module>
   </modules>
 
   <properties>

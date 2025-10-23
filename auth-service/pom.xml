@@ -7,12 +7,12 @@
 		<artifactId>reser-pro</artifactId>
 		<version>1.0-SNAPSHOT</version>
 	</parent>
-	
+
 	<groupId>com.reser-pro</groupId>
-	<artifactId>payment</artifactId>
+	<artifactId>auth-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>payment</name>
-	<description>Spring Boot Microservice Payment</description>
+	<name>auth-service</name>
+	<description>Spring Boot Microservice Authentication</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -49,7 +49,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -86,7 +86,6 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- MapStruct (DTO Mapping) -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
@@ -145,5 +144,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
