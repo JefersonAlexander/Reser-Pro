@@ -163,4 +163,89 @@ public class PropertyService {
         }
         return dto;
     }
+
+    @Transactional
+    public PropertyDto updateProperty(Long id, PropertyDto propertyDto) {
+        // 1. Buscar la propiedad existente
+        Property existingProperty = propertyRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Property not found with id: " + id));
+
+        // 2. Actualizar campos simples
+        existingProperty.setPropertyName(propertyDto.getPropertyName());
+        existingProperty.setPropertyDescription(propertyDto.getPropertyDescription());
+        existingProperty.setPropertyType(propertyDto.getPropertyType());
+        existingProperty.setPropertyStatus(propertyDto.getPropertyStatus());
+        existingProperty.setReserveType(propertyDto.getReserveType());
+        existingProperty.setReservePrice(propertyDto.getReservePrice());
+        existingProperty.setMaxCapacity(propertyDto.getMaxCapacity());
+        existingProperty.setSalePrice(propertyDto.getSalePrice());
+
+        // 3. Actualizar relaciones
+
+        // Relación @ManyToOne: Owner (User)
+        if (propertyDto.getOwnerId() != null && !propertyDto.getOwnerId().equals(existingProperty.getOwner().getUserId())) {
+            User newOwner = userRepository.findById(propertyDto.getOwnerId())
+                    .orElseThrow(() -> new EntityNotFoundException("Owner (User) not found with id: " + propertyDto.getOwnerId()));
+            existingProperty.setOwner(newOwner);
+        }
+
+        // Relación @ManyToOne: Publication
+        if (propertyDto.getPublicationType() != null && !propertyDto.getPublicationType().equals(existingProperty.getPublication().getPublicationType())) {
+            Publication newPublication = publicationRepository.findByPublicationType(propertyDto.getPublicationType())
+                    .orElseThrow(() -> new EntityNotFoundException("PublicationType not found: " + propertyDto.getPublicationType()));
+            existingProperty.setPublication(newPublication);
+        }
+
+        // Relación @OneToOne: Address
+        if (propertyDto.getAddress() != null) {
+            Address existingAddress = existingProperty.getAddress();
+            if (existingAddress == null) {
+                existingAddress = new Address();
+                existingAddress.setProperty(existingProperty);
+                existingProperty.setAddress(existingAddress);
+            }
+            // Actualizar campos de la dirección
+            existingAddress.setCountry(propertyDto.getAddress().getCountry());
+            existingAddress.setState(propertyDto.getAddress().getState());
+            existingAddress.setCity(propertyDto.getAddress().getCity());
+            existingAddress.setStreet(propertyDto.getAddress().getStreet());
+            existingAddress.setLatitude(propertyDto.getAddress().getLatitude());
+            existingAddress.setLongitud(propertyDto.getAddress().getLongitud());
+        }
+
+        // Relación @OneToMany: Photos (con orphanRemoval=true)
+        if (propertyDto.getPhotos() != null) {
+            // Limpiamos las fotos antiguas (JPA las borrará gracias a orphanRemoval)
+            existingProperty.getPhotos().clear();
+
+            // Añadimos las nuevas fotos
+            Set<PropertyPhoto> newPhotos = propertyDto.getPhotos().stream()
+                    .map(photoDto -> {
+                        PropertyPhoto photo = photoMapper.toEntity(photoDto);
+                        photo.setProperty(existingProperty); // Establecer relación
+                        return photo;
+                    })
+                    .collect(Collectors.toSet());
+            existingProperty.getPhotos().addAll(newPhotos);
+        }
+
+        // Relación @ManyToMany: Amenities
+        if (propertyDto.getAmenities() != null) {
+            Set<Long> amenityIds = propertyDto.getAmenities().stream()
+                    .map(AmenityDto::getAmenityId)
+                    .collect(Collectors.toSet());
+
+            Set<Amenity> newAmenities = amenityRepository.findAllById(amenityIds)
+                    .stream().collect(Collectors.toSet());
+
+            // Asignamos el nuevo conjunto de amenities
+            existingProperty.setAmenities(newAmenities);
+        }
+
+        // 4. Guardar la entidad actualizada
+        Property updatedProperty = propertyRepository.save(existingProperty);
+
+        // 5. Devolver el DTO
+        return mapPropertyToDto(updatedProperty);
+    }
 }
