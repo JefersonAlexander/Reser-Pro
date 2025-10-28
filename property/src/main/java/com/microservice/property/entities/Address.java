@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "addresses")
-@Data
 @Getter
 @Setter
 
