@@ -12,7 +12,7 @@ import lombok.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
-public class PropertyDetailsDto {
+public class PropertyDto {
   private Long propertyId;
   private Long ownerId;
   private String propertyName;

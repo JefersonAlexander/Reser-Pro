@@ -1,4 +1,4 @@
-package com.microservice.property.Dtos;
+package com.microservice.property.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -6,7 +6,9 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Getter
+@Setter
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 
 public class AddressDto {
