@@ -4,6 +4,7 @@ import org.mapstruct.factory.Mappers;
 
 import com.microservice.booking.DTO.ReservationDTO;
 import com.microservice.booking.entity.Reservation;
+import com.microservice.booking.DTO.ReservationDetailDTO;
 
 
 
@@ -17,6 +18,6 @@ public interface ReservationMapper {
     ReservationMapper INSTANCE = Mappers.getMapper(ReservationMapper.class);
 
     ReservationDTO toDto(Reservation reservation);
-    ReservationDTO toDetailDTO(Reservation reservation);
+    ReservationDetailDTO toDetailDTO(Reservation reservation);
     Reservation toEntity(ReservationDTO reservationDTO);
 }

@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class ReservationDTO {
-   
-    private Long clientId;
+public class ReservationDetailDTO {
+    private Long id;
+    private ClientDTO client;
     private Long roomId;
     private String startDate;
     private String endDate;
     private Double totalPrice;
-    private Long statusId;
+    private ReservationStatusDTO status;
     private Integer numberOfGuests;
 }
 

@@ -1,8 +1,8 @@
 package com.microservice.booking.service;
 
-import com.microservice.booking.model.Client;
+import com.microservice.booking.entity.Client;
 import com.microservice.booking.repository.ClientRepository;
-import com.microservice.booking.dto.ClientDTO;
+import com.microservice.booking.DTO.ClientDTO;
 import com.microservice.booking.mapper.ClientMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,9 @@ import java.util.List;
 public class ClientService {
     @Autowired
     private ClientRepository clientRepository;
+    private ClientMapper clientMapper;
 
-    public ClientService(ClientRepository clientRepository,ClientMapper clientMapper) {
+    public ClientService(ClientRepository clientRepository, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
     }
@@ -36,17 +37,6 @@ public class ClientService {
         return clientMapper.toDto(client);
     }
 
-    public ClientDTO updateClient(Long id, ClientDTO clientDTO) {
-        Client client = clientRepository.findById(id).orElse(null);
-        if (client != null) {
-            client.setName(clientDTO.getName());
-            client.setEmail(clientDTO.getEmail());
-            // Update other fields as necessary
-            client = clientRepository.save(client);
-            return clientMapper.toDto(client);
-        }
-        return null;
-    }
 
     public void deleteClient(Long id) {
         clientRepository.deleteById(id);
