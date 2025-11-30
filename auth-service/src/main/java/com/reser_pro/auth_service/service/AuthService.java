@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.reser_pro.auth_service.DTO.LoginRequest;
@@ -38,7 +39,13 @@ public class AuthService {
     @Autowired
     private UserMapper userMapper;
 
-    public LoginResponse login(LoginRequest request) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthAuditService auditService;
+
+    public LoginResponse login(LoginRequest request) throws Exception {
         Authentication auth = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
@@ -47,6 +54,11 @@ public class AuthService {
 
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getIsActive()) {
+            auditService.saveAudit(user, "LOGIN_USER_NOT_ACTIVE", "User: " + user.getUserName() + " is not active for login.");
+            throw new Exception("User is not active!");
+        }
 
         List<String> roles = user.getRoles()
             .stream()
@@ -59,14 +71,21 @@ public class AuthService {
                                                                     user.getPhoneNumber(), 
                                                                     roles);
 
+        auditService.saveAudit(user, "LOGIN_SUCCESFULL", "User: " + user.getUserName() + " logged in.");
+
         return new LoginResponse(jwtUtil.generateToken(userDetails), userLoginResponse);
     }
 
-    public UserDTO register(RegisterRequest request) {
+    public UserDTO register(RegisterRequest request) throws Exception {
         User user = new User();
 
+        if (userRepository.existsByEmail(request.getEmail())) {
+            auditService.saveAudit(null, "REGISTER_WITH_EXISTING_EMAIL", "Email: " + request.getEmail() + " already exists.");
+            throw new Exception("User already exists");
+        }
+
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setUserName(request.getUserName());
         user.setPhoneNumber(request.getPhoneNumber());
 
@@ -88,6 +107,17 @@ public class AuthService {
         }
 
         user = userRepository.save(user);
+
+        UserDTO userDTO = userMapper.toDTO(user);
+
+        StringBuilder rolesString = new StringBuilder();
+
+        for (String roleStr : userDTO.getRoles()) {
+            rolesString.append(roleStr);
+            rolesString.append(" ");
+        }
+
+        auditService.saveAudit(user, "REGISTER_SUCCESFUL", "User: " + user.getUserName() + " was registered as " + rolesString);
 
         return userMapper.toDTO(user);
     }

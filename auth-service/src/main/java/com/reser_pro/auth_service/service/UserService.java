@@ -3,6 +3,7 @@ package com.reser_pro.auth_service.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.reser_pro.auth_service.DTO.EditRequest;
@@ -18,6 +19,9 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private AuthAuditService auditService;
 
     private static final String USER_NOT_FOUND_MSG = "User not found";
     
@@ -46,7 +50,27 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MSG));
         
         user.setIsActive(true);
-        user = userRepository.save(user);
+        userRepository.save(user);
+
+        String adminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        auditService.saveAudit(admin, "USER_ACTIVATED", "Usuario: " + user.getUserName() + " activado por el admin: " + admin.getUserName());
+    }
+
+    public void desactivateUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException(USER_NOT_FOUND_MSG));
+
+        user.setIsActive(false);
+        userRepository.save(user);
+
+        String adminEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        auditService.saveAudit(admin, "USER_DESACTIVATED", "Usuario: " + user.getUserName() + " desactivado por el admin: " + admin.getUserName());
     }
 
     public UserDTO editUser(Long userId, EditRequest request) {

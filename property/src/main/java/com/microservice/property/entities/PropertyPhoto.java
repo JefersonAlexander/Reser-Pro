@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "property_photos")
-@Data
 @Getter
 @Setter
 

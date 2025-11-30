@@ -13,19 +13,23 @@ import com.reser_pro.auth_service.DTO.RegisterRequest;
 import com.reser_pro.auth_service.DTO.UserDTO;
 import com.reser_pro.auth_service.service.AuthService;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
     @Autowired
     private AuthService authService;
 
+    @Operation(summary = "Login", description = "Retorna el JWT luego de loguearse")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) throws Exception {
         return ResponseEntity.ok(authService.login(request));
     }
 
+    @Operation(summary = "Registro de usuario", description = "Retorna el usuario registrado")
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<UserDTO> register(@RequestBody RegisterRequest request) throws Exception {
         return ResponseEntity.ok(authService.register(request));
     }
 }

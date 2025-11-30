@@ -15,7 +15,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("API de Microservicio de Propiedades")
                         .version("1.0.0")
-                        .description("Esta API REST gestiona las Propiedades, Usuarios, Amenities y Publicaciones del sistema.")
+                        .description("Esta API REST gestiona las propiedades, usuarios, comodidades y publicaciones del sistema.")
                         .termsOfService("http://swagger.io/terms/") // URL de tus términos de servicio
                         .license(new License()
                                 .name("Apache 2.0")
