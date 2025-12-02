@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AuthServiceApplication",
+            "request": "launch",
+            "mainClass": "com.reser_pro.auth_service.AuthServiceApplication",
+            "projectName": "auth-service"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-BookingApplication<booking>",
             "request": "launch",
             "cwd": "${workspaceFolder}",

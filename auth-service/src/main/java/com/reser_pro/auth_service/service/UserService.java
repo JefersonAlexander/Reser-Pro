@@ -42,7 +42,7 @@ public class UserService {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException(USER_NOT_FOUND_MSG);
         }
-        userRepository.deleteById(userId);
+        desactivateUser(userId);
     }
 
     public void activateUser(Long userId) {
